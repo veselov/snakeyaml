@@ -124,11 +124,13 @@ public final class Emitter implements Emitable {
     private boolean whitespace;
     private boolean indention;
     private boolean openEnded;
+    private boolean emptyLine;
 
     // Formatting details.
     private final Boolean canonical;
     // pretty print flow by adding extra line breaks
     private final Boolean multiLineFlow;
+    private final boolean spaceOut;
 
     private final boolean allowUnicode;
     private int bestIndent;
@@ -163,11 +165,13 @@ public final class Emitter implements Emitable {
         // The current indentation level and the stack of previous indents.
         this.indents = new ArrayStack(10);
         this.indent = null;
+        this.spaceOut = opts.isSpaceOut();
         // Flow level.
         this.flowLevel = 0;
         // Contexts.
         mappingContext = false;
         simpleKeyContext = false;
+        emptyLine = true;
 
         //
         // Characteristics of the last emitted character:
@@ -218,6 +222,9 @@ public final class Emitter implements Emitable {
             this.event = this.events.poll();
             this.state.expect();
             this.event = null;
+        }
+        if (spaceOut && (event.getEventId() == Event.ID.MappingEnd || event.getEventId() == Event.ID.SequenceEnd)) {
+            writeEmptyLine();
         }
     }
 
@@ -1105,6 +1112,7 @@ public final class Emitter implements Emitable {
         this.whitespace = whitespace;
         this.indention = this.indention && indentation;
         this.column += indicator.length();
+        this.emptyLine = false;
         openEnded = false;
         stream.write(indicator);
     }
@@ -1131,9 +1139,11 @@ public final class Emitter implements Emitable {
             stream.write(" ");
         }
         this.column += length;
+        this.emptyLine = false;
     }
 
     private void writeLineBreak(String data) {
+        if (column == 0) { return; }
         this.whitespace = true;
         this.indention = true;
         this.column = 0;
@@ -1144,9 +1154,17 @@ public final class Emitter implements Emitable {
         }
     }
 
+    private void writeEmptyLine() {
+        if (emptyLine) { return; }
+        emptyLine = true;
+        writeLineBreak(null);
+        stream.write(this.bestLineBreak);
+    }
+
     void writeVersionDirective(String versionText) {
         stream.write("%YAML ");
         stream.write(versionText);
+        column = 1;
         writeLineBreak(null);
     }
 
@@ -1157,6 +1175,7 @@ public final class Emitter implements Emitable {
         stream.write(handleText);
         stream.write(SPACE);
         stream.write(prefixText);
+        column = 1;
         writeLineBreak(null);
     }
 
@@ -1181,6 +1200,7 @@ public final class Emitter implements Emitable {
                     } else {
                         int len = end - start;
                         this.column += len;
+                        this.emptyLine = false;
                         stream.write(text, start, len);
                     }
                     start = end;
@@ -1206,6 +1226,7 @@ public final class Emitter implements Emitable {
                     if (start < end) {
                         int len = end - start;
                         this.column += len;
+                        this.emptyLine = false;
                         stream.write(text, start, len);
                         start = end;
                     }
@@ -1213,6 +1234,7 @@ public final class Emitter implements Emitable {
             }
             if (ch == '\'') {
                 this.column += 2;
+                this.emptyLine = false;
                 stream.write("''");
                 start = end + 1;
             }
@@ -1239,6 +1261,7 @@ public final class Emitter implements Emitable {
                 if (start < end) {
                     int len = end - start;
                     this.column += len;
+                    this.emptyLine = false;
                     stream.write(text, start, len);
                     start = end;
                 }
@@ -1269,6 +1292,7 @@ public final class Emitter implements Emitable {
                         data = String.valueOf(ch);
                     }
                     this.column += data.length();
+                    this.emptyLine = false;
                     stream.write(data);
                     start = end + 1;
                 }
@@ -1285,6 +1309,7 @@ public final class Emitter implements Emitable {
                     start = end;
                 }
                 this.column += data.length();
+                this.emptyLine = false;
                 stream.write(data);
                 writeIndent();
                 this.whitespace = false;
@@ -1357,6 +1382,7 @@ public final class Emitter implements Emitable {
                     } else {
                         int len = end - start;
                         this.column += len;
+                        this.emptyLine = false;
                         stream.write(text, start, len);
                     }
                     start = end;
@@ -1365,6 +1391,7 @@ public final class Emitter implements Emitable {
                 if (CharConstants.LINEBR.has(ch, "\0 ")) {
                     int len = end - start;
                     this.column += len;
+                    this.emptyLine = false;
                     stream.write(text, start, len);
                     if (ch == 0) {
                         writeLineBreak(null);
@@ -1435,6 +1462,7 @@ public final class Emitter implements Emitable {
         }
         if (!this.whitespace) {
             this.column++;
+            this.emptyLine = false;
             stream.write(SPACE);
         }
         this.whitespace = false;
@@ -1457,6 +1485,7 @@ public final class Emitter implements Emitable {
                     } else {
                         int len = end - start;
                         this.column += len;
+                        this.emptyLine = false;
                         stream.write(text, start, len);
                     }
                     start = end;
@@ -1483,6 +1512,7 @@ public final class Emitter implements Emitable {
                 if (CharConstants.LINEBR.has(ch, "\0 ")) {
                     int len = end - start;
                     this.column += len;
+                    this.emptyLine = false;
                     stream.write(text, start, len);
                     start = end;
                 }

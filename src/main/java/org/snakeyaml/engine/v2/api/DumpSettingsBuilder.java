@@ -59,9 +59,10 @@ public final class DumpSettingsBuilder {
     private boolean splitLines;
     private int maxSimpleKeyLength;
     private boolean indentWithIndicator;
+    private boolean spaceOut;
 
     //general
-    Map<SettingKey, Object> customProperties = new HashMap();
+    Map<SettingKey, Object> customProperties = new HashMap<>();
 
     /**
      * Create builder
@@ -347,6 +348,11 @@ public final class DumpSettingsBuilder {
         return this;
     }
 
+    public DumpSettingsBuilder setSpaceOut(boolean spaceOut) {
+        this.spaceOut = spaceOut;
+        return this;
+    }
+
     /**
      * Create immutable DumpSettings
      *
@@ -359,7 +365,7 @@ public final class DumpSettingsBuilder {
                 //emitter
                 canonical, multiLineFlow, useUnicodeEncoding,
                 indent, indicatorIndent, width, bestLineBreak, splitLines, maxSimpleKeyLength,
-                customProperties, indentWithIndicator);
+                customProperties, indentWithIndicator, spaceOut);
     }
 }
 
