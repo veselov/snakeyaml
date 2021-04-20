@@ -800,7 +800,11 @@ public final class Emitter implements Emitable {
         if (ev.isPlain() && ev.getImplicit().canOmitTagInPlainScalar()) {
             if (!(simpleKeyContext && (analysis.isEmpty() || analysis.isMultiline()))
                     && ((flowLevel != 0 && analysis.isAllowFlowPlain()) || (flowLevel == 0 && analysis.isAllowBlockPlain()))) {
-                return Optional.empty();
+                if (spaceOut && column + ev.getValue().length() > 120) {
+                    return Optional.of(ScalarStyle.FOLDED);
+                } else {
+                    return Optional.empty();
+                }
             }
         }
         if (!ev.isPlain() && (ev.getScalarStyle() == ScalarStyle.LITERAL || ev.getScalarStyle() == ScalarStyle.FOLDED)) {
@@ -836,7 +840,7 @@ public final class Emitter implements Emitable {
                     writeSingleQuoted(analysis.getScalar(), split);
                     break;
                 case FOLDED:
-                    writeFolded(analysis.getScalar(), split);
+                    writeFolded(analysis.getScalar(), split || spaceOut);
                     break;
                 case LITERAL:
                     writeLiteral(analysis.getScalar());
@@ -1405,6 +1409,7 @@ public final class Emitter implements Emitable {
             }
             end++;
         }
+        writeEmptyLine();
     }
 
     void writeLiteral(String text) {
@@ -1451,6 +1456,11 @@ public final class Emitter implements Emitable {
             }
             end++;
         }
+
+        if (spaceOut) {
+            writeEmptyLine();
+        }
+
     }
 
     void writePlain(String text, boolean split) {
