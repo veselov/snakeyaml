@@ -1052,11 +1052,19 @@ public final class Emitter implements Emitable {
                 }
             }
         }
+
         // Let's decide what styles are allowed.
         boolean allowFlowPlain = true;
         boolean allowBlockPlain = true;
         boolean allowSingleQuoted = true;
         boolean allowBlock = true;
+
+        // very special fix for ESYNC-5961
+        if ("NULL".equals(scalar)) {
+            allowFlowPlain = allowBlockPlain = false;
+        }
+
+
         // Leading and trailing whitespaces are bad for plain scalars.
         if (leadingSpace || leadingBreak || trailingSpace || trailingBreak) {
             allowFlowPlain = allowBlockPlain = false;

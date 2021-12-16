@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.snakeyaml</groupId>
     <artifactId>snakeyaml-engine</artifactId>
-    <version>2.2.1-xl4.1</version>
+    <version>2.2.1-xl4.2</version>
     <!-- changed to jar as bundle plugin doesn't work -->
     <packaging>jar</packaging>
     <properties>
