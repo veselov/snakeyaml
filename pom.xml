@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.snakeyaml</groupId>
     <artifactId>snakeyaml-engine</artifactId>
-    <version>2.2.1-xl4.2</version>
+    <version>2.2.1-xl4.3-SNAPSHOT</version>
     <!-- changed to jar as bundle plugin doesn't work -->
     <packaging>jar</packaging>
     <properties>
@@ -45,9 +45,9 @@
         </mailingList>
     </mailingLists>
     <scm>
-        <connection>scm:git:http://bitbucket.org/veselov/snakeyaml-engine</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.org/veselov/snakeyaml-engine</developerConnection>
-        <url>https://bitbucket.org/veselov/snakeyaml-engine/src</url>
+        <connection>scm:git:https://github.com/veselov/snakeyaml.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:veselov/snakeyaml.git</developerConnection>
+        <url>https://github.com/veselov/snakeyaml</url>
     </scm>
     <licenses>
         <license>
